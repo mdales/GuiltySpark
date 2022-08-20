@@ -3,6 +3,7 @@ import Foundation
 public struct Entry: Codable {
 	public enum EntryType: Codable {
 		case tag(String)
+		case title(String)
 		case content(String, Int)
 	}
 

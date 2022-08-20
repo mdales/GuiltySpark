@@ -6,6 +6,11 @@ import shared
 
 let fm = FileManager.default
 
+// These are the words used in *my* frontmatter, I imagine this will need to
+// be in a configuration file long term
+let KeyTags = "tags"
+let KeyTitle = "title"
+
 func parseMarkdownDocument(_ path: URL, baseurl: URL) throws -> Document? {
 
 	let data = try Data(contentsOf: path)
@@ -19,14 +24,25 @@ func parseMarkdownDocument(_ path: URL, baseurl: URL) throws -> Document? {
 	let converted = frontmatter.mapValues(FrontmatterValue.fromAny)
 
 	var things: [Entry] = []
-	if let tags = converted["tags"] {
+	if let tags = converted[KeyTags] {
 		switch tags {
 		case .stringValue(let tag):
-			things = [Entry(.tag(tag))]
+			things = [Entry(.tag(tag.lowercased()))]
 		case .arrayValue(let tags):
 			things = tags.map {
-				Entry(.tag($0))
+				Entry(.tag($0.lowercased()))
 			}
+		default:
+			break
+		}
+	}
+
+	if let title = converted[KeyTitle] {
+		switch title {
+		case .stringValue(let title):
+			let parts = title.components(separatedBy: .whitespacesAndNewlines)
+				.filter{$0.count > 0}.map{ Entry(.title($0.lowercased())) }
+			things += parts
 		default:
 			break
 		}

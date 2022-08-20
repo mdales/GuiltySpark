@@ -14,6 +14,8 @@ public struct NaiveSearchEngine {
 					word = value
 				case let .content(value, _):
 					word = value
+				case let .title(value):
+					word = value
 				}
 				guard let word = word else {
 					return
@@ -28,9 +30,22 @@ public struct NaiveSearchEngine {
 
 	public func findMatches(_ terms: [String]) -> [Document] {
 		return terms.flatMap{ term -> [Int] in
-			self.invertedIndex[term.lowercased()] ?? []
+			self.invertedIndex[term] ?? []
 		}.map{
 			self.index[$0]
 		}
+	}
+
+	public static func rankMatch(terms: [String], document: Document) -> Int {
+		return document.entries.map { entry -> Int in
+			switch entry.entry {
+			case .tag(let value):
+				return 100 * terms.filter{$0 == value}.count
+			case .title(let value):
+				return 10 * terms.filter{$0 == value}.count
+			case .content(let value, _):
+				return 1 * terms.filter{$0 == value}.count
+			}
+		}.reduce(0, +)
 	}
 }

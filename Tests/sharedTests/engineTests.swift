@@ -34,4 +34,22 @@ final class engineTests: XCTestCase {
 		result = engine.findMatches(["foo", "bar"])
 		XCTAssertEqual(result.count, 2)
 	}
+
+	func testRanking() throws {
+		let document = Document(
+			path: "/a",
+			frontmatter: [:],
+			entries: [
+			Entry(.tag("tag")),
+			Entry(.title("title")),
+			Entry(.content("content", 42))
+			]
+		)
+
+		XCTAssertEqual(NaiveSearchEngine.rankMatch(terms: ["tag"], document: document), 100)
+		XCTAssertEqual(NaiveSearchEngine.rankMatch(terms: ["title"], document: document), 10)
+		XCTAssertEqual(NaiveSearchEngine.rankMatch(terms: ["content"], document: document), 1)
+		XCTAssertEqual(NaiveSearchEngine.rankMatch(terms: ["wibble"], document: document), 0)
+		XCTAssertEqual(NaiveSearchEngine.rankMatch(terms: ["tag", "title"], document: document), 110)
+	}
 }

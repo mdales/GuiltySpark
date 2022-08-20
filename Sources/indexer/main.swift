@@ -16,18 +16,27 @@ func parseMarkdownDocument(_ path: URL, baseurl: URL) throws -> Document? {
 		return nil
 	}
 
+	let converted = frontmatter.mapValues(FrontmatterValue.fromAny)
+
 	var things: [Entry] = []
-	if let tags = frontmatter["tags"] as? [String] {
-		things = tags.map {
-			Entry(
-				entry: .tag($0)
-			)
+	if let tags = converted["tags"] {
+		switch tags {
+		case .stringValue(let tag):
+			things = [Entry(entry: .tag(tag))]
+		case .arrayValue(let tags):
+			things = tags.map {
+				Entry(
+					entry: .tag($0)
+				)
+			}
+		default:
+			break
 		}
 	}
+
 	return Document(
 		path: String(path.path.dropFirst(baseurl.path.count)),
-		title: frontmatter["title"] as? String ?? "Unknown title",
-		synopsis: frontmatter["synopsis"] as? String,
+		frontmatter: converted,
 		entries: things
 	)
 }

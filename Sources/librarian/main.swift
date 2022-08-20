@@ -5,9 +5,8 @@ import MicroExpress
 import shared
 
 struct Result: Codable {
-	let title: String
-	let synopsis: String?
 	let path: String
+	let frontmatter: [String:FrontmatterValue]
 }
 
 struct Searcher: ParsableCommand {
@@ -38,9 +37,8 @@ struct Searcher: ParsableCommand {
 				let hits = engine.findMatches(term: text)
 				let results = hits.map {
 					Result(
-						title: $0.title,
-						synopsis: $0.synopsis,
-						path: $0.path.replacingOccurrences(of: "md", with: "html")
+						path: $0.publishedPath,
+						frontmatter: $0.frontmatter
 					)
 				}
 				res.json(results)

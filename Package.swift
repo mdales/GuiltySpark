@@ -4,7 +4,7 @@
 import PackageDescription
 
 let package = Package(
-    name: "swiftnio2test",
+    name: "GuiltySpark",
     dependencies: [
         .package(url: "https://github.com/apple/swift-nio.git", from: "2.0.0"),
         .package(url: "https://github.com/apple/swift-argument-parser", from: "1.0.0"),
@@ -15,6 +15,10 @@ let package = Package(
         .target(
             name: "shared",
             dependencies: []
+        ),
+        .testTarget(
+            name: "sharedTests",
+            dependencies: ["shared"]
         ),
         .executableTarget(
             name: "librarian",

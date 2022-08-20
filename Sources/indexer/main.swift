@@ -22,12 +22,10 @@ func parseMarkdownDocument(_ path: URL, baseurl: URL) throws -> Document? {
 	if let tags = converted["tags"] {
 		switch tags {
 		case .stringValue(let tag):
-			things = [Entry(entry: .tag(tag))]
+			things = [Entry(.tag(tag))]
 		case .arrayValue(let tags):
 			things = tags.map {
-				Entry(
-					entry: .tag($0)
-				)
+				Entry(.tag($0))
 			}
 		default:
 			break

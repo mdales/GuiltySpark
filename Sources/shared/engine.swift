@@ -26,11 +26,10 @@ public struct NaiveSearchEngine {
 		self.invertedIndex = invertedIndex
 	}
 
-	public func findMatches(term: String) -> [Document] {
-		guard let documentlist = self.invertedIndex[term.lowercased()] else {
-			return []
-		}
-		return documentlist.map {
+	public func findMatches(_ terms: [String]) -> [Document] {
+		return terms.flatMap{ term -> [Int] in
+			self.invertedIndex[term.lowercased()] ?? []
+		}.map{
 			self.index[$0]
 		}
 	}

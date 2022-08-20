@@ -34,7 +34,11 @@ struct Searcher: ParsableCommand {
 					res.send("No info")
 					return
 				}
-				let hits = engine.findMatches(term: text)
+
+				let parts = text.components(separatedBy: .whitespacesAndNewlines)
+					.filter{$0.count > 0}
+
+				let hits = engine.findMatches(parts)
 				let results = hits.map {
 					Result(
 						path: $0.publishedPath,

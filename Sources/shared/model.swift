@@ -8,7 +8,7 @@ public struct Entry: Codable {
 
 	let entry: EntryType
 
-	public init(entry: EntryType) {
+	public init(_ entry: EntryType) {
 		self.entry = entry
 	}
 }

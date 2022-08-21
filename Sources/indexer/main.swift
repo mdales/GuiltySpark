@@ -78,6 +78,7 @@ func recursiveProcess(_ path: URL, baseurl: URL) throws -> [Document] {
 
 struct Indexer: ParsableCommand {
 	@Argument() var contentPath: String
+	@Argument() var outputFile: String
 
 	func run() {
 		print("looking in \(contentPath)")
@@ -89,7 +90,7 @@ struct Indexer: ParsableCommand {
 
 			let jsonEncoder = JSONEncoder()
 			let jsonData = try jsonEncoder.encode(corpus)
-			try jsonData.write(to: URL(fileURLWithPath: "corpus.json"), options: [])
+			try jsonData.write(to: URL(fileURLWithPath: outputFile), options: [])
 		} catch {
 			print("Failed to read \(contentPath): \(error)")
 		}

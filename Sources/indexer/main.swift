@@ -8,11 +8,6 @@ import shared
 
 let fm = FileManager.default
 
-// These are the words used in *my* frontmatter, I imagine this will need to
-// be in a configuration file long term
-let KeyTags = "tags"
-let KeyTitle = "title"
-
 enum ParseError: Error {
 	case StemmerLoadFailure
 }
@@ -28,30 +23,7 @@ func parseMarkdownDocument(_ path: URL, baseurl: URL) throws -> Document? {
 	}
 
 	let converted = frontmatter.mapValues(FrontmatterValue.fromAny)
-	var things: [Entry] = []
-	if let tags = converted[KeyTags] {
-		switch tags {
-		case .stringValue(let tag):
-			things = [Entry(.tag(normaliseString(tag)))]
-		case .arrayValue(let tags):
-			things = Set(tags.map { normaliseString($0) }).map {
-				Entry(.tag($0))
-			}
-		default:
-			break
-		}
-	}
-
-	if let title = converted[KeyTitle] {
-		switch title {
-		case .stringValue(let title):
-			let parts = NaiveSearchEngine.tokeniseString(title)
-				.map { Entry(.title($0)) }
-			things += parts
-		default:
-			break
-		}
-	}
+	let things = Entry.entriesFromFrontmatter(converted)
 
 	return Document(
 		path: String(path.path.dropFirst(baseurl.path.count)),

@@ -38,10 +38,7 @@ struct Searcher: ParsableCommand {
 				let parts = text.components(separatedBy: .whitespacesAndNewlines)
 					.filter{$0.count > 0}.map{$0.lowercased()}
 
-				let hits = engine.findMatches(parts).sorted {
-					NaiveSearchEngine.rankMatch(terms: parts, document: $0) >
-						NaiveSearchEngine.rankMatch(terms: parts, document: $1)
-				}
+				let hits = engine.findAndRank(Set(parts))
 				let results = hits.map {
 					Result(
 						path: $0.publishedPath,

@@ -1,6 +1,6 @@
 import XCTest
 
-import shared
+@testable import shared
 
 final class engineTests: XCTestCase {
 
@@ -46,10 +46,10 @@ final class engineTests: XCTestCase {
 			]
 		)
 
-		XCTAssertEqual(NaiveSearchEngine.rankMatch(terms: ["tag"], document: document), 100)
-		XCTAssertEqual(NaiveSearchEngine.rankMatch(terms: ["title"], document: document), 10)
-		XCTAssertEqual(NaiveSearchEngine.rankMatch(terms: ["content"], document: document), 1)
-		XCTAssertEqual(NaiveSearchEngine.rankMatch(terms: ["wibble"], document: document), 0)
-		XCTAssertEqual(NaiveSearchEngine.rankMatch(terms: ["tag", "title"], document: document), 110)
+		XCTAssertEqual(NaiveSearchEngine.rankMatch(terms: Set(["tag"]), document: document), 100)
+		XCTAssertEqual(NaiveSearchEngine.rankMatch(terms: Set(["title"]), document: document), 10)
+		XCTAssertEqual(NaiveSearchEngine.rankMatch(terms: Set(["content"]), document: document), 1)
+		XCTAssertEqual(NaiveSearchEngine.rankMatch(terms: Set(["wibble"]), document: document), 0)
+		XCTAssertEqual(NaiveSearchEngine.rankMatch(terms: Set(["tag", "title"]), document: document), 110)
 	}
 }

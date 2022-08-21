@@ -1,5 +1,15 @@
 import Foundation
 
+import PorterStemmer2
+
+// Don't like having this global, but not sure where better
+// to put it?
+let stemmer = PorterStemmer(withLanguage: .English)!
+
+public func normaliseString(_ term: String) -> String {
+	return stemmer.stem(term.lowercased())
+}
+
 public struct Entry: Codable {
 	public enum EntryType: Codable {
 		case tag(String)

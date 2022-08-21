@@ -28,7 +28,7 @@ public struct NaiveSearchEngine {
 		self.invertedIndex = invertedIndex
 	}
 
-	public func findMatches(_ terms: [String]) -> [Document] {
+	func findMatches(_ terms: Set<String>) -> [Document] {
 		return terms.flatMap{ term -> [Int] in
 			self.invertedIndex[term] ?? []
 		}.map{
@@ -36,7 +36,7 @@ public struct NaiveSearchEngine {
 		}
 	}
 
-	public static func rankMatch(terms: [String], document: Document) -> Int {
+	static func rankMatch(terms: Set<String>, document: Document) -> Int {
 		return document.entries.map { entry -> Int in
 			switch entry.entry {
 			case .tag(let value):
@@ -47,5 +47,13 @@ public struct NaiveSearchEngine {
 				return 1 * terms.filter{$0 == value}.count
 			}
 		}.reduce(0, +)
+	}
+
+	public func findAndRank(_ terms: Set<String>) -> [Document] {
+		let normalised_terms = Set(terms.map { normaliseString($0) })
+		return findMatches(normalised_terms).sorted {
+			NaiveSearchEngine.rankMatch(terms: normalised_terms, document: $0) >
+				NaiveSearchEngine.rankMatch(terms: normalised_terms, document: $1)
+		}
 	}
 }

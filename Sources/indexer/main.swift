@@ -1,5 +1,7 @@
-import ArgumentParser
 import Foundation
+
+import ArgumentParser
+import PorterStemmer2
 import Yams
 
 import shared
@@ -10,6 +12,10 @@ let fm = FileManager.default
 // be in a configuration file long term
 let KeyTags = "tags"
 let KeyTitle = "title"
+
+enum ParseError: Error {
+	case StemmerLoadFailure
+}
 
 func parseMarkdownDocument(_ path: URL, baseurl: URL) throws -> Document? {
 
@@ -22,15 +28,14 @@ func parseMarkdownDocument(_ path: URL, baseurl: URL) throws -> Document? {
 	}
 
 	let converted = frontmatter.mapValues(FrontmatterValue.fromAny)
-
 	var things: [Entry] = []
 	if let tags = converted[KeyTags] {
 		switch tags {
 		case .stringValue(let tag):
-			things = [Entry(.tag(tag.lowercased()))]
+			things = [Entry(.tag(normaliseString(tag)))]
 		case .arrayValue(let tags):
-			things = tags.map {
-				Entry(.tag($0.lowercased()))
+			things = Set(tags.map { normaliseString($0) }).map {
+				Entry(.tag($0))
 			}
 		default:
 			break
@@ -40,8 +45,10 @@ func parseMarkdownDocument(_ path: URL, baseurl: URL) throws -> Document? {
 	if let title = converted[KeyTitle] {
 		switch title {
 		case .stringValue(let title):
-			let parts = title.components(separatedBy: .whitespacesAndNewlines)
-				.filter{$0.count > 0}.map{ Entry(.title($0.lowercased())) }
+			let parts = Set(title.components(separatedBy: .whitespacesAndNewlines)
+				.filter { $0.count > 0 }
+				.map { normaliseString($0) })
+				.map { Entry(.title($0)) }
 			things += parts
 		default:
 			break

@@ -35,6 +35,24 @@ final class engineTests: XCTestCase {
 		XCTAssertEqual(result.count, 2)
 	}
 
+	func testNoDuplicateResults() throws {
+		let documents = [
+			Document(
+				path: "/a",
+				frontmatter: [:],
+				entries: [Entry(.tag("foo")), Entry(.title("foo"))]
+			),
+		]
+
+		let engine = NaiveSearchEngine(documents)
+
+		// Before we used sets in the index we'd get two hits for this document,
+		// once for the tag and once for the title
+		let result = engine.findMatches(["foo"])
+		XCTAssertEqual(result.count, 1)
+		XCTAssertEqual(result[0].path, "/a")
+	}
+
 	func testRanking() throws {
 		let document = Document(
 			path: "/a",

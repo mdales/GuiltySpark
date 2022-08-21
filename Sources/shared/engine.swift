@@ -1,11 +1,11 @@
 public struct NaiveSearchEngine {
 
 	let index: [Document]
-	let invertedIndex: Dictionary<String, [Int]>
+	let invertedIndex: [String:Set<Int>]
 
 	public init(_ documents: [Document]) {
 		self.index = documents
-		var invertedIndex = [String:[Int]]()
+		var invertedIndex = [String:Set<Int>]()
 		for (index, document) in documents.enumerated() {
 			document.entries.forEach { entry in
 				var word: String? = nil
@@ -20,8 +20,8 @@ public struct NaiveSearchEngine {
 				guard let word = word else {
 					return
 				}
-				var documentlist = invertedIndex[word.lowercased()] ?? []
-				documentlist.insert(index, at: 0)
+				var documentlist = invertedIndex[word.lowercased()] ?? Set<Int>()
+				documentlist.insert(index)
 				invertedIndex[word.lowercased()] = documentlist
 			}
 		}
@@ -29,8 +29,8 @@ public struct NaiveSearchEngine {
 	}
 
 	func findMatches(_ terms: Set<String>) -> [Document] {
-		return terms.flatMap{ term -> [Int] in
-			self.invertedIndex[term] ?? []
+		return terms.flatMap{ term -> Set<Int> in
+			self.invertedIndex[term] ?? Set<Int>()
 		}.map{
 			self.index[$0]
 		}

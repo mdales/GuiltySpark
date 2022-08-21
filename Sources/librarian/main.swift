@@ -9,27 +9,59 @@ struct Result: Codable {
 	let frontmatter: [String:FrontmatterValue]
 }
 
+struct Config: Codable {
+	let corpusName: String
+	let corpusFilePath: String
+}
+
 struct Searcher: ParsableCommand {
-	@Argument() var corpusPath: String
+	@Argument() var corpusConfigPath: String
 
 	func run() {
-		let corpus_url = URL(fileURLWithPath: corpusPath)
+		let config_url = URL(fileURLWithPath: corpusConfigPath)
+		let decoder = JSONDecoder()
+
 		do {
-			let data = try Data(contentsOf: corpus_url)
-			let corpus = try JSONDecoder().decode([Document].self, from: data)
-			print("Loaded \(corpus.count) documents")
-			let engine = NaiveSearchEngine(corpus)
+			let config_data = try Data(contentsOf: config_url)
+			let config = try decoder.decode([Config].self, from: config_data)
+			let engines = try config.reduce(into: [String:NaiveSearchEngine]()) {
+				let corpus_url = URL(fileURLWithPath: $1.corpusFilePath)
+				let corpus_data = try Data(contentsOf: corpus_url)
+				let corpus = try decoder.decode([Document].self, from:corpus_data)
+				$0[$1.corpusName] = NaiveSearchEngine(corpus)
+			}
+
 			let server = Express()
 
 			// Logging
 			server.use { req, res, next in
 			 	print("\(req.header.method):", req.header.uri)
-			     next()
+			    next()
 			}
 
 			server.use(querystring)
 
 			server.get("/search/") {req, res, next in
+
+				var corpusSelection: String? = nil
+
+				// try to find which corpus to use by header
+				if let header = req.header.headers.filter{ $0.0 == "X-Corpus"}.first {
+					corpusSelection = header.1
+				}
+				// query arg takes precedence over header
+				if let corpus_arg = req.param("corpus") {
+					corpusSelection = corpus_arg;
+				}
+				guard let corpusSelection = corpusSelection else {
+					res.send("No corpus secified")
+					return
+				}
+				guard let engine = engines[corpusSelection] else {
+					res.send("Corpus not found")
+					return
+				}
+
 				guard let query = req.param("q") else {
 					res.send("No info")
 					return

@@ -1,3 +1,5 @@
+import Foundation
+
 public struct NaiveSearchEngine {
 
 	let index: [Document]
@@ -28,6 +30,12 @@ public struct NaiveSearchEngine {
 		self.invertedIndex = invertedIndex
 	}
 
+	public static func tokeniseString(_ query: String) -> Set<String> {
+		let seperators = CharacterSet.whitespacesAndNewlines.union(CharacterSet.punctuationCharacters)
+		return Set(query.components(separatedBy: seperators)
+			.filter{$0.count > 0}.map{normaliseString($0)})
+	}
+
 	func findMatches(_ terms: Set<String>) -> [Document] {
 		return terms.flatMap{ term -> Set<Int> in
 			self.invertedIndex[term] ?? Set<Int>()
@@ -49,7 +57,8 @@ public struct NaiveSearchEngine {
 		}.reduce(0, +)
 	}
 
-	public func findAndRank(_ terms: Set<String>) -> [Document] {
+	public func findAndRank(_ term: String) -> [Document] {
+		let terms = NaiveSearchEngine.tokeniseString(term)
 		let normalised_terms = Set(terms.map { normaliseString($0) })
 		return findMatches(normalised_terms).sorted {
 			NaiveSearchEngine.rankMatch(terms: normalised_terms, document: $0) >

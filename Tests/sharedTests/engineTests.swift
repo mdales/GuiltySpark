@@ -70,4 +70,15 @@ final class engineTests: XCTestCase {
 		XCTAssertEqual(NaiveSearchEngine.rankMatch(terms: Set(["wibble"]), document: document), 0)
 		XCTAssertEqual(NaiveSearchEngine.rankMatch(terms: Set(["tag", "title"]), document: document), 110)
 	}
+
+	func testTokenisation() throws {
+		XCTAssertEqual(
+			NaiveSearchEngine.tokeniseString("Hello, World!"),
+			Set(["hello", "world"])
+		)
+		XCTAssertEqual(
+			NaiveSearchEngine.tokeniseString("    abc123   "),
+			Set(["abc123"])
+		)
+	}
 }

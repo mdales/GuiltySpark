@@ -50,4 +50,12 @@ final class sharedTests: XCTestCase {
         let val = FrontmatterValue.fromAny(testval)
         XCTAssertEqual(val, FrontmatterValue.stringValue("\(testval)"))
     }
+
+    func testNormaliseString() throws {
+        XCTAssertEqual(normaliseString("abc"), "abc")
+        XCTAssertEqual(normaliseString("ABC"), "abc")
+        XCTAssertEqual(normaliseString("like"), "like")
+        XCTAssertEqual(normaliseString("likely"), "like")
+        XCTAssertEqual(normaliseString("liked"), "like")
+    }
 }

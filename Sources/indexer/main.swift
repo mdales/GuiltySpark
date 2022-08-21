@@ -45,9 +45,7 @@ func parseMarkdownDocument(_ path: URL, baseurl: URL) throws -> Document? {
 	if let title = converted[KeyTitle] {
 		switch title {
 		case .stringValue(let title):
-			let parts = Set(title.components(separatedBy: .whitespacesAndNewlines)
-				.filter { $0.count > 0 }
-				.map { normaliseString($0) })
+			let parts = NaiveSearchEngine.tokeniseString(title)
 				.map { Entry(.title($0)) }
 			things += parts
 		default:

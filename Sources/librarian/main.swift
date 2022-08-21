@@ -30,15 +30,12 @@ struct Searcher: ParsableCommand {
 			server.use(querystring)
 
 			server.get("/search/") {req, res, next in
-				guard let text = req.param("q") else {
+				guard let query = req.param("q") else {
 					res.send("No info")
 					return
 				}
 
-				let parts = text.components(separatedBy: .whitespacesAndNewlines)
-					.filter{$0.count > 0}.map{$0.lowercased()}
-
-				let hits = engine.findAndRank(Set(parts))
+				let hits = engine.findAndRank(query)
 				let results = hits.map {
 					Result(
 						path: $0.publishedPath,

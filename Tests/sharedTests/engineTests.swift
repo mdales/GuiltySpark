@@ -35,6 +35,31 @@ final class engineTests: XCTestCase {
 		XCTAssertEqual(result.count, 2)
 	}
 
+	func testNotRegularEnglishCharactersOperation() throws {
+		let documents = [
+			Document(
+				path: "/a",
+				frontmatter: [:],
+				entries: [Entry(.tag("älgen"))]
+			),
+			Document(
+				path: "/b",
+				frontmatter: [:],
+				entries: [Entry(.tag("🎸"))]
+			)
+		]
+
+		let engine = NaiveSearchEngine(documents)
+
+		var result = engine.findMatches(["älgen"])
+		XCTAssertEqual(result.count, 1)
+		XCTAssertEqual(result[0].path, "/a")
+
+		result = engine.findMatches(["🎸"])
+		XCTAssertEqual(result.count, 1)
+		XCTAssertEqual(result[0].path, "/b")
+	}
+
 	func testNoDuplicateResults() throws {
 		let documents = [
 			Document(
@@ -80,5 +105,41 @@ final class engineTests: XCTestCase {
 			NaiveSearchEngine.tokeniseString("    abc123   "),
 			Set(["abc123"])
 		)
+	}
+
+	func testCombinedOperation() throws {
+		let documents = [
+			Document(
+				path: "/a",
+				frontmatter: [:],
+				entries: [Entry(.tag(normaliseString("foo")))]
+			),
+			Document(
+				path: "/b",
+				frontmatter: [:],
+				entries: [Entry(.tag(normaliseString("bar")))]
+			),
+			Document(
+				path: "/c",
+				frontmatter: [:],
+				entries: [Entry(.tag(normaliseString("älgen")))]
+			)
+		]
+
+		let engine = NaiveSearchEngine(documents)
+
+		var result = engine.findAndRank("foo")
+		XCTAssertEqual(result.count, 1)
+		XCTAssertEqual(result[0].path, "/a")
+
+		result = engine.findAndRank("wibble")
+		XCTAssertEqual(result.count, 0)
+
+		result = engine.findAndRank("foo bar")
+		XCTAssertEqual(result.count, 2)
+
+		result = engine.findAndRank("älgen")
+		XCTAssertEqual(result.count, 1)
+		XCTAssertEqual(result[0].path, "/c")
 	}
 }

@@ -59,10 +59,9 @@ public struct NaiveSearchEngine {
 
 	public func findAndRank(_ term: String) -> [Document] {
 		let terms = NaiveSearchEngine.tokeniseString(term)
-		let normalised_terms = Set(terms.map { normaliseString($0) })
-		return findMatches(normalised_terms).sorted {
-			NaiveSearchEngine.rankMatch(terms: normalised_terms, document: $0) >
-				NaiveSearchEngine.rankMatch(terms: normalised_terms, document: $1)
+		return findMatches(terms).sorted {
+			NaiveSearchEngine.rankMatch(terms: terms, document: $0) >
+				NaiveSearchEngine.rankMatch(terms: terms, document: $1)
 		}
 	}
 }

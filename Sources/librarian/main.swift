@@ -66,8 +66,12 @@ struct Searcher: ParsableCommand {
 					res.send("No info")
 					return
 				}
+				guard let decoded_query = query.removingPercentEncoding else {
+					res.send("Faied to decode")
+					return
+				}
 
-				let hits = engine.findAndRank(query)
+				let hits = engine.findAndRank(decoded_query)
 				let results = hits.map {
 					Result(
 						path: $0.publishedPath,
@@ -78,7 +82,7 @@ struct Searcher: ParsableCommand {
 			}
 
 			server.get("/") { req, res, next in
-			  	res.send("Hello World")
+			  	res.send("Hello, World!")
 			}
 
 			server.listen(4242)

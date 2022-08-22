@@ -67,4 +67,13 @@ final class sharedTests: XCTestCase {
         // Emoji fail with the current stemmer :(
         // XCTAssertEqual(normaliseString("🎸"), "🎸")
     }
+
+    func testHugoNameMangling() throws {
+        var document = Document(path: "a/b/index.md", frontmatter: [:], entries: [])
+        XCTAssertEqual(document.publishedPath, "a/b/index.html")
+
+        document = Document(path: "a/b.md", frontmatter: [:], entries: [])
+        XCTAssertEqual(document.publishedPath, "a/b/index.html")
+    }
+
 }

@@ -99,6 +99,12 @@ public struct Document: Codable {
 	}
 
 	public var publishedPath: String {
-		path.replacingOccurrences(of: ".md", with: ".html").lowercased()
+		let url = URL(fileURLWithPath: self.path)
+		let filename = url.lastPathComponent
+		if filename == "index.md" {
+			return path.replacingOccurrences(of: ".md", with: ".html").lowercased()
+		} else {
+			return path.replacingOccurrences(of: ".md", with: "/index.html").lowercased()
+		}
 	}
 }

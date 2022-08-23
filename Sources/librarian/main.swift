@@ -78,7 +78,19 @@ struct Searcher: ParsableCommand {
 						frontmatter: $0.frontmatter
 					)
 				}
-				res.json(results)
+
+				do {
+					let encoder = JSONEncoder()
+					if #available(macOS 12.0, *) {
+						encoder.dateEncodingStrategy = .iso8601
+					}
+					let data = try encoder.encode(results)
+					res["Content-Type"]   = "application/json"
+					res["Content-Length"] = "\(data.count)"
+					res.send(bytes: data)
+				} catch {
+					res.send("Failed to encode response")
+				}
 			}
 
 			server.get("/") { req, res, next in

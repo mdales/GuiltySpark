@@ -51,6 +51,16 @@ final class sharedTests: XCTestCase {
         XCTAssertEqual(val, FrontmatterValue.stringValue("\(testval)"))
     }
 
+    func testFrontmatterSerialisation() throws {
+        let testval = Date()
+        let val = FrontmatterValue.fromAny(testval)
+        XCTAssertEqual(val, FrontmatterValue.dateValue(testval))
+
+        let jsonData = try JSONEncoder().encode(val)
+        let new_val = try JSONDecoder().decode(FrontmatterValue.self, from: jsonData)
+        XCTAssertEqual(val, new_val)
+    }
+
     func testNormaliseString() throws {
         XCTAssertEqual(normaliseString("abc"), "abc")
         XCTAssertEqual(normaliseString("ABC"), "abc")

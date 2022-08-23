@@ -46,7 +46,7 @@ struct Searcher: ParsableCommand {
 				var corpusSelection: String? = nil
 
 				// try to find which corpus to use by header
-				if let header = req.header.headers.filter{ $0.0 == "X-Corpus"}.first {
+				if let header = req.header.headers.filter({ $0.0 == "X-Corpus"}).first {
 					corpusSelection = header.1
 				}
 				// query arg takes precedence over header

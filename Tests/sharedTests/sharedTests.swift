@@ -4,17 +4,6 @@ import shared
 
 final class sharedTests: XCTestCase {
 
-    func testBasicPathMangling() throws {
-        let doc = Document(
-            path: "/test/PaTh/index.md",
-            frontmatter: [:],
-            entries: []
-        )
-
-        // tests extention has changed and all to lowercase
-        XCTAssertEqual(doc.publishedPath, "/test/path/index.html")
-    }
-
     func testFrontmatterValueFromString() throws {
         let testval = "test"
         let val = FrontmatterValue.fromAny(testval)
@@ -76,14 +65,6 @@ final class sharedTests: XCTestCase {
 
         // Emoji fail with the current stemmer :(
         // XCTAssertEqual(normaliseString("🎸"), "🎸")
-    }
-
-    func testHugoNameMangling() throws {
-        var document = Document(path: "a/b/index.md", frontmatter: [:], entries: [])
-        XCTAssertEqual(document.publishedPath, "a/b/index.html")
-
-        document = Document(path: "a/b.md", frontmatter: [:], entries: [])
-        XCTAssertEqual(document.publishedPath, "a/b/index.html")
     }
 
 }

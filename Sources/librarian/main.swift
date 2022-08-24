@@ -4,14 +4,10 @@ import MicroExpress
 
 import shared
 
-struct Result: Codable {
-	let path: String
-	let frontmatter: [String:FrontmatterValue]
-}
-
 struct Config: Codable {
 	let corpusName: String
 	let corpusFilePath: String
+	let bibliographyFilePath: String
 }
 
 struct Searcher: ParsableCommand {
@@ -29,6 +25,9 @@ struct Searcher: ParsableCommand {
 				let corpus_data = try Data(contentsOf: corpus_url)
 				let corpus = try decoder.decode([Document].self, from:corpus_data)
 				$0[$1.corpusName] = NaiveSearchEngine(corpus)
+			}
+			let bibliographies = try config.reduce(into: [String:Bibliography]()) {
+				$0[$1.corpusName] = try loadBibliography($1.bibliographyFilePath)
 			}
 
 			let server = Express()
@@ -61,6 +60,10 @@ struct Searcher: ParsableCommand {
 					res.send("Corpus not found")
 					return
 				}
+				guard let bibliography = bibliographies[corpusSelection] else {
+					res.send("Bibliogrpahy not found")
+					return
+				}
 
 				guard let query = req.param("q") else {
 					res.send("No info")
@@ -73,10 +76,7 @@ struct Searcher: ParsableCommand {
 
 				let hits = engine.findAndRank(decoded_query)
 				let results = hits.map {
-					Result(
-						path: $0.publishedPath,
-						frontmatter: $0.frontmatter
-					)
+					bibliography[$0.path]
 				}
 
 				do {
@@ -93,7 +93,7 @@ struct Searcher: ParsableCommand {
 					// Swift release, despite the compiler insisting I put a macOS warning on
 					// the code :)
 					let encoder = JSONEncoder()
-					if #available(macOS 12.0, *) {
+					if #available(macOS 10.12, iOS 10.0, *) {
 						encoder.dateEncodingStrategy = .iso8601
 					}
 					let data = try encoder.encode(results)

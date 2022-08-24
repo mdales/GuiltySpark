@@ -26,8 +26,7 @@ func parseMarkdownDocument(_ path: URL, baseurl: URL) throws -> Document? {
 	let things = Entry.entriesFromFrontmatter(converted)
 
 	return Document(
-		path: String(path.path.dropFirst(baseurl.path.count)),
-		frontmatter: converted,
+		path: String(path.path.dropFirst(baseurl.path.count + 1)),
 		entries: things
 	)
 }

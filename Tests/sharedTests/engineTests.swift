@@ -8,12 +8,10 @@ final class engineTests: XCTestCase {
 		let documents = [
 			Document(
 				path: "/a",
-				frontmatter: [:],
 				entries: [Entry(.tag("foo"))]
 			),
 			Document(
 				path: "/b",
-				frontmatter: [:],
 				entries: [Entry(.tag("bar"))]
 			)
 		]
@@ -39,12 +37,10 @@ final class engineTests: XCTestCase {
 		let documents = [
 			Document(
 				path: "/a",
-				frontmatter: [:],
 				entries: [Entry(.tag("älgen"))]
 			),
 			Document(
 				path: "/b",
-				frontmatter: [:],
 				entries: [Entry(.tag("🎸"))]
 			)
 		]
@@ -64,7 +60,6 @@ final class engineTests: XCTestCase {
 		let documents = [
 			Document(
 				path: "/a",
-				frontmatter: [:],
 				entries: [Entry(.tag("foo")), Entry(.title("foo"))]
 			),
 		]
@@ -81,11 +76,10 @@ final class engineTests: XCTestCase {
 	func testRanking() throws {
 		let document = Document(
 			path: "/a",
-			frontmatter: [:],
 			entries: [
-			Entry(.tag("tag")),
-			Entry(.title("title")),
-			Entry(.content("content", 42))
+				Entry(.tag("tag")),
+				Entry(.title("title")),
+				Entry(.content("content", 42))
 			]
 		)
 
@@ -111,17 +105,14 @@ final class engineTests: XCTestCase {
 		let documents = [
 			Document(
 				path: "/a",
-				frontmatter: [:],
 				entries: [Entry(.tag(normaliseString("foo")))]
 			),
 			Document(
 				path: "/b",
-				frontmatter: [:],
 				entries: [Entry(.tag(normaliseString("bar")))]
 			),
 			Document(
 				path: "/c",
-				frontmatter: [:],
 				entries: [Entry(.tag(normaliseString("älgen")))]
 			)
 		]

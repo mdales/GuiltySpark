@@ -85,26 +85,13 @@ public enum FrontmatterValue: Codable, Equatable {
 
 public struct Document: Codable {
 	public let path: String
-	public let frontmatter: [String:FrontmatterValue]
 	let entries: [Entry]
 
 	public init(
 		path: String,
-		frontmatter: [String:FrontmatterValue],
 		entries: [Entry]
 	) {
 		self.path = path
-		self.frontmatter = frontmatter
 		self.entries = entries
-	}
-
-	public var publishedPath: String {
-		let url = URL(fileURLWithPath: self.path)
-		let filename = url.lastPathComponent
-		if filename == "index.md" {
-			return path.replacingOccurrences(of: ".md", with: ".html").lowercased()
-		} else {
-			return path.replacingOccurrences(of: ".md", with: "/index.html").lowercased()
-		}
 	}
 }

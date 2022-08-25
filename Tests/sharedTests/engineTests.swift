@@ -20,14 +20,14 @@ final class engineTests: XCTestCase {
 
 		var result = engine.findMatches(["foo"])
 		XCTAssertEqual(result.count, 1)
-		XCTAssertEqual(result[0].path, "/a")
+		XCTAssertEqual(result.first!.path, "/a")
 
 		result = engine.findMatches(["wibble"])
 		XCTAssertEqual(result.count, 0)
 
 		result = engine.findMatches(["foo", "wibble"])
 		XCTAssertEqual(result.count, 1)
-		XCTAssertEqual(result[0].path, "/a")
+		XCTAssertEqual(result.first!.path, "/a")
 
 		result = engine.findMatches(["foo", "bar"])
 		XCTAssertEqual(result.count, 2)
@@ -49,14 +49,14 @@ final class engineTests: XCTestCase {
 
 		var result = engine.findMatches(["älgen"])
 		XCTAssertEqual(result.count, 1)
-		XCTAssertEqual(result[0].path, "/a")
+		XCTAssertEqual(result.first!.path, "/a")
 
 		result = engine.findMatches(["🎸"])
 		XCTAssertEqual(result.count, 1)
-		XCTAssertEqual(result[0].path, "/b")
+		XCTAssertEqual(result.first!.path, "/b")
 	}
 
-	func testNoDuplicateResults() throws {
+	func testNoDuplicateResultsBetweenEntryTypes() throws {
 		let documents = [
 			Document(
 				path: "/a",
@@ -70,7 +70,22 @@ final class engineTests: XCTestCase {
 		// once for the tag and once for the title
 		let result = engine.findMatches(["foo"])
 		XCTAssertEqual(result.count, 1)
-		XCTAssertEqual(result[0].path, "/a")
+		XCTAssertEqual(result.first!.path, "/a")
+	}
+
+	func testNoDuplicateResultsWithinEntryTypes() throws {
+		let documents = [
+			Document(
+				path: "/a",
+				entries: [Entry(.tag("foo")), Entry(.tag("bar"))]
+			),
+		]
+
+		let engine = NaiveSearchEngine(documents)
+
+		let result = engine.findMatches(["foo", "bar"])
+		XCTAssertEqual(result.count, 1)
+		XCTAssertEqual(result.first!.path, "/a")
 	}
 
 	func testRanking() throws {

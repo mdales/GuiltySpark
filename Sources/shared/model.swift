@@ -83,7 +83,7 @@ public enum FrontmatterValue: Codable, Equatable {
 	}
 }
 
-public struct Document: Codable {
+public struct Document: Codable, Hashable {
 	public let path: String
 	let entries: [Entry]
 
@@ -93,5 +93,13 @@ public struct Document: Codable {
 	) {
 		self.path = path
 		self.entries = entries
+	}
+
+	public static func == (lhs: Document, rhs: Document) -> Bool {
+		return lhs.path == rhs.path
+	}
+
+	public func hash(into hasher: inout Hasher) {
+		hasher.combine(path)
 	}
 }

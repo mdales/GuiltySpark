@@ -36,12 +36,12 @@ public struct NaiveSearchEngine {
 			.filter{$0.count > 0}.map{normaliseString($0)})
 	}
 
-	func findMatches(_ terms: Set<String>) -> [Document] {
-		return terms.flatMap{ term -> Set<Int> in
+	func findMatches(_ terms: Set<String>) -> Set<Document> {
+		return Set(terms.flatMap{ term -> Set<Int> in
 			self.invertedIndex[term] ?? Set<Int>()
 		}.map{
 			self.index[$0]
-		}
+		})
 	}
 
 	static func rankMatch(terms: Set<String>, document: Document) -> Int {

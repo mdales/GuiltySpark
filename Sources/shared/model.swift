@@ -14,6 +14,7 @@ public func normaliseString(_ term: String) -> String {
 // be in a configuration file long term
 let KeyTags = "tags"
 let KeyTitle = "title"
+public let KeyDraft = "draft"
 
 public struct Entry: Codable {
 	public enum EntryType: Codable {

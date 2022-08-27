@@ -15,20 +15,9 @@ struct Searcher: ParsableCommand {
 
 	func run() {
 		let config_url = URL(fileURLWithPath: corpusConfigPath)
-		let decoder = JSONDecoder()
 
 		do {
-			let config_data = try Data(contentsOf: config_url)
-			let config = try decoder.decode([Config].self, from: config_data)
-			let engines = try config.reduce(into: [String:NaiveSearchEngine]()) {
-				let corpus_url = URL(fileURLWithPath: $1.corpusFilePath)
-				let corpus_data = try Data(contentsOf: corpus_url)
-				let corpus = try decoder.decode([Document].self, from:corpus_data)
-				$0[$1.corpusName] = NaiveSearchEngine(corpus)
-			}
-			let bibliographies = try config.reduce(into: [String:Bibliography]()) {
-				$0[$1.corpusName] = try loadBibliography($1.bibliographyFilePath)
-			}
+			let library = try Library(config_url: config_url)
 
 			let server = Express()
 
@@ -56,27 +45,25 @@ struct Searcher: ParsableCommand {
 					res.send("No corpus secified")
 					return
 				}
-				guard let engine = engines[corpusSelection] else {
-					res.send("Corpus not found")
-					return
-				}
-				guard let bibliography = bibliographies[corpusSelection] else {
-					res.send("Bibliogrpahy not found")
-					return
-				}
 
 				guard let query = req.param("q") else {
 					res.send("No info")
 					return
 				}
 				guard let decoded_query = query.removingPercentEncoding else {
-					res.send("Faied to decode")
+					res.send("Failed to decode")
 					return
 				}
 
-				let hits = engine.findAndRank(decoded_query)
-				let results = hits.map {
-					bibliography[$0.path]
+				let results: [BibPage]
+				do {
+					results = try library.find(corpus: corpusSelection, query: decoded_query)
+				} catch LibraryError.CorpusNotFound {
+					res.send("Corpus not found")
+					return
+				} catch {
+					res.send("Unexpected error: \(error)")
+					return
 				}
 
 				do {

@@ -21,8 +21,19 @@ func parseMarkdownDocument(_ path: URL, baseurl: URL) throws -> Document? {
 	guard let frontmatter = frontmatter else {
 		return nil
 	}
-
 	let converted = frontmatter.mapValues(FrontmatterValue.fromAny)
+
+	if let draft_status = converted[KeyDraft] {
+		switch draft_status {
+		case .booleValue(let is_draft):
+			if is_draft {
+				return nil
+			}
+		default:
+			break
+		}
+	}
+
 	let things = Entry.entriesFromFrontmatter(converted)
 
 	return Document(

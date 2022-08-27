@@ -10,24 +10,26 @@ public enum LibraryError: Error {
 	case CorpusNotFound
 }
 
-public final class Library {
+public struct Library {
 
 	let engines: [String:NaiveSearchEngine]
 	let bibliographies: [String:Bibliography]
 
-	public init(config_url: URL) throws {
+	public static func loadConfig(config_url: URL) throws -> Library {
 		let decoder = JSONDecoder()
 		let config_data = try Data(contentsOf: config_url)
 		let config = try decoder.decode([LibraryConfig].self, from: config_data)
-		engines = try config.reduce(into: [String:NaiveSearchEngine]()) {
+		let engines = try config.reduce(into: [String:NaiveSearchEngine]()) {
 			let corpus_url = URL(fileURLWithPath: $1.corpusFilePath)
 			let corpus_data = try Data(contentsOf: corpus_url)
 			let corpus = try decoder.decode([Document].self, from:corpus_data)
 			$0[$1.corpusName] = NaiveSearchEngine(corpus)
 		}
-		bibliographies = try config.reduce(into: [String:Bibliography]()) {
+		let bibliographies = try config.reduce(into: [String:Bibliography]()) {
 			$0[$1.corpusName] = try loadBibliography($1.bibliographyFilePath)
 		}
+
+		return Library(engines: engines, bibliographies: bibliographies)
 	}
 
 	public func find(corpus: String, query: String) throws -> [BibPage] {

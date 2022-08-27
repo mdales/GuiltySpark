@@ -17,8 +17,7 @@ struct Searcher: ParsableCommand {
 		let config_url = URL(fileURLWithPath: corpusConfigPath)
 
 		do {
-			let library = try Library(config_url: config_url)
-
+			let library = try Library.loadConfig(config_url: config_url)
 			let server = Express()
 
 			// Logging

@@ -13,13 +13,20 @@ struct Config: Codable {
 final class Server {
 
 	let corpusConfigPath: String
-	let library: Library
 	let server: Express
 	let port = 4242
+
+	let signalSource: DispatchSourceSignal
+	let signalQ = DispatchQueue(label: "libraryLoadQ")
+	let syncQ = DispatchQueue(label: "libraryAccessQ")
+	var library: Library
 
 	init(_ corpusConfigPath: String) throws {
 		self.corpusConfigPath = corpusConfigPath
 		self.library = try Library.loadConfig(configPath: corpusConfigPath)
+
+		signal(SIGHUP, SIG_IGN)
+		signalSource = DispatchSource.makeSignalSource(signal: SIGHUP, queue: signalQ)
 
 		server = Express()
 		server.use { req, res, next in
@@ -31,6 +38,20 @@ final class Server {
 	}
 
 	func run() {
+		signalSource.setEventHandler {
+			print("Reloading corpus")
+			let newLibrary: Library
+			do {
+				newLibrary = try Library.loadConfig(configPath: self.corpusConfigPath)
+				self.syncQ.sync {
+					self.library = newLibrary
+				}
+			} catch {
+				print("Failed to reload library: \(error)")
+			}
+			print("Done")
+		}
+		signalSource.resume()
 		server.listen(port)
 	}
 
@@ -59,9 +80,11 @@ final class Server {
 			return
 		}
 
-		let results: [BibPage]
+		var results = [BibPage]()
 		do {
-			results = try library.find(corpus: corpusSelection, query: decoded_query)
+			try syncQ.sync {
+				results = try library.find(corpus: corpusSelection, query: decoded_query)
+			}
 		} catch LibraryError.CorpusNotFound {
 			res.send("Corpus \(corpusSelection) not found")
 			return

@@ -43,11 +43,12 @@ final class Server {
 			let newLibrary: Library
 			do {
 				newLibrary = try Library.loadConfig(configPath: self.corpusConfigPath)
-				self.syncQ.sync {
-					self.library = newLibrary
-				}
 			} catch {
 				print("Failed to reload library: \(error)")
+				return
+			}
+			self.syncQ.sync {
+				self.library = newLibrary
 			}
 			print("Done")
 		}

@@ -65,30 +65,7 @@ struct Searcher: ParsableCommand {
 					return
 				}
 
-				do {
-					// The MicroExpress JSON handler just does the default encoding strategy
-					// with JSON codables, which means the date comes out in a Swift/Apple
-					// specific value that is number of seconds since 2001.
-					//
-					// In theory we could just write a new extension to the MicroExpress
-					// server response class, but they haven't made public all the necessary
-					// methods on the class definition (most are, but not all). I'll file
-					// an issue and see if I can get this fix upstreamed.
-					//
-					// Note that this code has been tested and works on Linux with the latest
-					// Swift release, despite the compiler insisting I put a macOS warning on
-					// the code :)
-					let encoder = JSONEncoder()
-					if #available(macOS 10.12, iOS 10.0, *) {
-						encoder.dateEncodingStrategy = .iso8601
-					}
-					let data = try encoder.encode(results)
-					res["Content-Type"]   = "application/json"
-					res["Content-Length"] = "\(data.count)"
-					res.send(bytes: data)
-				} catch {
-					res.send("Failed to encode response")
-				}
+				res.json(results)
 			}
 
 			server.get("/") { req, res, next in

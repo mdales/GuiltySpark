@@ -8,11 +8,13 @@ final class engineTests: XCTestCase {
 		let documents = [
 			Document(
 				path: "/a",
-				entries: [Entry(.tag("foo"))]
+				entries: [Entry(.tag("foo"))],
+				date: Date()
 			),
 			Document(
 				path: "/b",
-				entries: [Entry(.tag("bar"))]
+				entries: [Entry(.tag("bar"))],
+				date: Date()
 			)
 		]
 
@@ -37,11 +39,13 @@ final class engineTests: XCTestCase {
 		let documents = [
 			Document(
 				path: "/a",
-				entries: [Entry(.tag("älgen"))]
+				entries: [Entry(.tag("älgen"))],
+				date: Date()
 			),
 			Document(
 				path: "/b",
-				entries: [Entry(.tag("🎸"))]
+				entries: [Entry(.tag("🎸"))],
+				date: Date()
 			)
 		]
 
@@ -60,7 +64,8 @@ final class engineTests: XCTestCase {
 		let documents = [
 			Document(
 				path: "/a",
-				entries: [Entry(.tag("foo")), Entry(.title("foo"))]
+				entries: [Entry(.tag("foo")), Entry(.title("foo"))],
+				date: Date()
 			),
 		]
 
@@ -77,7 +82,8 @@ final class engineTests: XCTestCase {
 		let documents = [
 			Document(
 				path: "/a",
-				entries: [Entry(.tag("foo")), Entry(.tag("bar"))]
+				entries: [Entry(.tag("foo")), Entry(.tag("bar"))],
+				date: Date()
 			),
 		]
 
@@ -95,7 +101,8 @@ final class engineTests: XCTestCase {
 				Entry(.tag("tag")),
 				Entry(.title("title")),
 				Entry(.content("content", 42))
-			]
+			],
+			date: Date()
 		)
 
 		XCTAssertEqual(NaiveSearchEngine.rankMatch(terms: Set(["tag"]), document: document), 100)
@@ -120,15 +127,18 @@ final class engineTests: XCTestCase {
 		let documents = [
 			Document(
 				path: "/a",
-				entries: [Entry(.tag(normaliseString("foo")))]
+				entries: [Entry(.tag(normaliseString("foo")))],
+				date: Date()
 			),
 			Document(
 				path: "/b",
-				entries: [Entry(.tag(normaliseString("bar")))]
+				entries: [Entry(.tag(normaliseString("bar")))],
+				date: Date()
 			),
 			Document(
 				path: "/c",
-				entries: [Entry(.tag(normaliseString("älgen")))]
+				entries: [Entry(.tag(normaliseString("älgen")))],
+				date: Date()
 			)
 		]
 
@@ -147,5 +157,49 @@ final class engineTests: XCTestCase {
 		result = engine.findAndRank("älgen")
 		XCTAssertEqual(result.count, 1)
 		XCTAssertEqual(result[0].path, "/c")
+	}
+
+	func testResultOrderByDate() throws {
+		let documents = [
+			Document(
+				path: "/a",
+				entries: [Entry(.tag("foo"))],
+				date: Date() - 100
+			),
+			Document(
+				path: "/b",
+				entries: [Entry(.tag("foo"))],
+				date: Date()
+			)
+		]
+		let engine = NaiveSearchEngine(documents)
+
+		// Expect newest items first
+		let result = engine.findAndRank("foo")
+		XCTAssertEqual(result.count, 2)
+		XCTAssertEqual(result.first!.path, "/b")
+		XCTAssertEqual(result.last!.path, "/a")
+	}
+
+	func testResultOrderByType() throws {
+		let documents = [
+			Document(
+				path: "/a",
+				entries: [Entry(.title("foo"))],
+				date: Date()
+			),
+			Document(
+				path: "/b",
+				entries: [Entry(.tag("foo"))],
+				date: Date()
+			)
+		]
+		let engine = NaiveSearchEngine(documents)
+
+		// Expect newest items first
+		let result = engine.findAndRank("foo")
+		XCTAssertEqual(result.count, 2)
+		XCTAssertEqual(result.first!.path, "/b")
+		XCTAssertEqual(result.last!.path, "/a")
 	}
 }

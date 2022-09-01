@@ -60,8 +60,13 @@ public struct NaiveSearchEngine {
 	public func findAndRank(_ term: String) -> [Document] {
 		let terms = NaiveSearchEngine.tokeniseString(term)
 		return findMatches(terms).sorted {
-			NaiveSearchEngine.rankMatch(terms: terms, document: $0) >
-				NaiveSearchEngine.rankMatch(terms: terms, document: $1)
+			let lhs = NaiveSearchEngine.rankMatch(terms: terms, document: $0)
+			let rhs = NaiveSearchEngine.rankMatch(terms: terms, document: $1)
+			if lhs == rhs {
+				return $0.date > $1.date
+			} else {
+				return lhs > rhs
+			}
 		}
 	}
 }

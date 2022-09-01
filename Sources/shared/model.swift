@@ -14,6 +14,7 @@ public func normaliseString(_ term: String) -> String {
 // be in a configuration file long term
 let KeyTags = "tags"
 let KeyTitle = "title"
+public let KeyDate = "date"
 public let KeyDraft = "draft"
 
 public struct Entry: Codable {
@@ -87,13 +88,16 @@ public enum FrontmatterValue: Codable, Equatable {
 public struct Document: Codable, Hashable {
 	public let path: String
 	let entries: [Entry]
+	let date: Date
 
 	public init(
 		path: String,
-		entries: [Entry]
+		entries: [Entry],
+		date: Date
 	) {
 		self.path = path
 		self.entries = entries
+		self.date = date
 	}
 
 	public static func == (lhs: Document, rhs: Document) -> Bool {

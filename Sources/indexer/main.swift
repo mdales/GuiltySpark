@@ -36,9 +36,23 @@ func parseMarkdownDocument(_ path: URL, baseurl: URL) throws -> Document? {
 
 	let things = Entry.entriesFromFrontmatter(converted)
 
+	var date: Date? = nil
+	if let frontmatter_date = converted[KeyDate] {
+		switch frontmatter_date {
+		case .dateValue(let val):
+			date = val
+		default:
+			break
+		}
+	}
+	guard let date = date else {
+		return nil
+	}
+
 	return Document(
 		path: String(path.path.dropFirst(baseurl.path.count + 1)),
-		entries: things
+		entries: things,
+		date: date
 	)
 }
 
@@ -71,6 +85,9 @@ struct Indexer: ParsableCommand {
 			print("we processed \(corpus.count) documents")
 
 			let jsonEncoder = JSONEncoder()
+			if #available(macOS 10.12, *) {
+				jsonEncoder.dateEncodingStrategy = .iso8601
+			}
 			let jsonData = try jsonEncoder.encode(corpus)
 			try jsonData.write(to: URL(fileURLWithPath: outputFile), options: [])
 		} catch {

@@ -18,6 +18,9 @@ public struct Library {
 	public static func loadConfig(configPath: String) throws -> Library {
 		let config_url = URL(fileURLWithPath: configPath)
 		let decoder = JSONDecoder()
+		if #available(macOS 10.12, *) {
+			decoder.dateDecodingStrategy = .iso8601
+		}
 		let config_data = try Data(contentsOf: config_url)
 		let config = try decoder.decode([LibraryConfig].self, from: config_data)
 		let engines = try config.reduce(into: [String:NaiveSearchEngine]()) {

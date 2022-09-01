@@ -15,7 +15,8 @@ public struct Library {
 	let engines: [String:NaiveSearchEngine]
 	let bibliographies: [String:Bibliography]
 
-	public static func loadConfig(config_url: URL) throws -> Library {
+	public static func loadConfig(configPath: String) throws -> Library {
+		let config_url = URL(fileURLWithPath: configPath)
 		let decoder = JSONDecoder()
 		let config_data = try Data(contentsOf: config_url)
 		let config = try decoder.decode([LibraryConfig].self, from: config_data)

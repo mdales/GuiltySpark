@@ -2,6 +2,8 @@ import Foundation
 
 import PorterStemmer2
 
+import FrontMatter
+
 // Don't like having this global, but not sure where better
 // to put it?
 let stemmer = PorterStemmer(withLanguage: .English)!
@@ -59,29 +61,9 @@ public struct Entry: Codable {
 		}
 		return things
 	}
-}
 
-public enum FrontmatterValue: Codable, Equatable {
-	case stringValue(String)
-	case arrayValue([String])
-	case dateValue(Date)
-	case intValue(Int)
-	case booleValue(Bool)
-
-	public static func fromAny(_ before: Any) -> FrontmatterValue {
-		if let value = before as? String {
-			return .stringValue(value)
-		} else if let value = before as? Date {
-			return .dateValue(value)
-		} else if let value = before as? [String] {
-			return .arrayValue(value)
-		} else if let value = before as? Bool {
-			return .booleValue(value)
-		} else if let value = before as? Int {
-			return .intValue(value)
-		}
-		// clearly ick, but given YML is untyped the best I think we can do
-		return FrontmatterValue.stringValue("\(before)")
+	static public func entriesFromMarkdown(_ markdown: String) -> [Entry] {
+		return []
 	}
 }
 

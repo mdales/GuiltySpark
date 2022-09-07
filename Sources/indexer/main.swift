@@ -4,6 +4,7 @@ import ArgumentParser
 import PorterStemmer2
 import Yams
 
+import FrontMatter
 import shared
 
 let fm = FileManager.default
@@ -15,9 +16,27 @@ enum ParseError: Error {
 func parseMarkdownDocument(_ path: URL, baseurl: URL) throws -> Document? {
 
 	let data = try Data(contentsOf: path)
-	let frontmatter = try Yams.Parser(yaml: data, resolver: .default, constructor: .default, encoding: .default)
-		.nextRoot()?.any as? Dictionary<String,Any>
+	let parser = try Yams.Parser(yaml: data, resolver: .default, constructor: .default, encoding: .default)
+	guard let frontmatterNode = try parser.nextRoot() else {
+		return nil
+	}
 
+	// The Yams parser doesn't give us a clean way to get the rest of the document, so we mostly let
+	// it error trying to parse the data after the frontmatter and assume that the offset it gives us
+	// is where the markdown starts
+	var markdown_mark: Mark? = nil
+	do {
+		let next = try parser.nextRoot()
+		markdown_mark = next?.mark
+	} catch YamlError.parser(_, let problem, let mark, _) {
+		markdown_mark = mark
+	} catch YamlError.scanner(_, let problem, let mark, let yaml) {
+		markdown_mark = mark
+	}
+	// If there's other errors we don't handle let them bubble up, hence no catchall catch
+
+
+	let frontmatter = frontmatterNode.any as? Dictionary<String,Any>
 	guard let frontmatter = frontmatter else {
 		return nil
 	}
@@ -34,7 +53,22 @@ func parseMarkdownDocument(_ path: URL, baseurl: URL) throws -> Document? {
 		}
 	}
 
-	let things = Entry.entriesFromFrontmatter(converted)
+	var things = Entry.entriesFromFrontmatter(converted)
+
+	if let markdown_mark = markdown_mark {
+		if let document = String(data: data, encoding: .utf8) {
+			// We now need to use the line number/offset to work out where the parser stopped working
+			let lines = document.split(separator: "\n")
+			let fail_line = markdown_mark.line - 1 // This is human readable line number
+			if lines.count > fail_line {
+				print(lines[fail_line])
+			} else {
+				print("document \(path) has \(lines.count) lines, and yaml fail is at \(markdown_mark)")
+			}
+
+			things += Entry.entriesFromMarkdown(document)
+		}
+	}
 
 	var date: Date? = nil
 	if let frontmatter_date = converted[KeyDate] {

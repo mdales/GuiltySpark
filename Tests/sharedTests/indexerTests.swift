@@ -1,5 +1,6 @@
 import XCTest
 
+import FrontMatter
 @testable import shared
 
 final class indexerTests: XCTestCase {

@@ -16,11 +16,21 @@ let package = Package(
             name: "shared",
             dependencies: [
                 .product(name: "PorterStemmer2", package: "swift-Porter-Stemmer-2"),
+                "FrontMatter"
             ]
         ),
         .testTarget(
             name: "sharedTests",
             dependencies: ["shared"]
+        ),
+        .target(
+            name: "FrontMatter",
+            dependencies: [
+            ]
+        ),
+        .testTarget(
+            name: "FrontMatterTests",
+            dependencies: ["FrontMatter"]
         ),
         .executableTarget(
             name: "librarian",
@@ -35,6 +45,7 @@ let package = Package(
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
                 .product(name: "Yams", package: "Yams"),
+                "FrontMatter",
                 "shared"
             ]
         )

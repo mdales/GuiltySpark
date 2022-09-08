@@ -12,7 +12,7 @@ final class indexerTests: XCTestCase {
 
 	func testBasicTagParsing() throws {
 		let frontmatter = [
-			KeyTags: FrontmatterValue.arrayValue(["foo", "bar"])
+			KeyTags: FrontMatterValue.arrayValue(["foo", "bar"])
 		]
 
 		let entries = Entry.entriesFromFrontmatter(frontmatter)
@@ -21,7 +21,7 @@ final class indexerTests: XCTestCase {
 
 	func testBasicTagParsingDuplication() throws {
 		let frontmatter = [
-			KeyTags: FrontmatterValue.arrayValue(["foo", "foo"])
+			KeyTags: FrontMatterValue.arrayValue(["foo", "foo"])
 		]
 
 		let entries = Entry.entriesFromFrontmatter(frontmatter)
@@ -30,7 +30,7 @@ final class indexerTests: XCTestCase {
 
 	func testComplexTagParsing() throws {
 		let frontmatter = [
-			KeyTags: FrontmatterValue.arrayValue(["foo bar", "wibble"])
+			KeyTags: FrontMatterValue.arrayValue(["foo bar", "wibble"])
 		]
 
 		let entries = Entry.entriesFromFrontmatter(frontmatter)
@@ -39,7 +39,7 @@ final class indexerTests: XCTestCase {
 
 	func testComplexTagParsingDuplication() throws {
 		let frontmatter = [
-			KeyTags: FrontmatterValue.arrayValue(["foo bar", "bar"])
+			KeyTags: FrontMatterValue.arrayValue(["foo bar", "bar"])
 		]
 
 		let entries = Entry.entriesFromFrontmatter(frontmatter)

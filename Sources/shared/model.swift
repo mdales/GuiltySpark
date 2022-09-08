@@ -32,7 +32,7 @@ public struct Entry: Codable {
 		self.entry = entry
 	}
 
-	static public func entriesFromFrontmatter(_ frontmatter: [String:FrontmatterValue]) -> [Entry] {
+	static public func entriesFromFrontmatter(_ frontmatter: [String:FrontMatterValue]) -> [Entry] {
 		var things: [Entry] = []
 		if let tags = frontmatter[KeyTags] {
 			switch tags {

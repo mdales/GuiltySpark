@@ -2,51 +2,51 @@ import XCTest
 
 import FrontMatter
 
-final class valueTests: XCTestCase {
+final class FrontMatterValueTests: XCTestCase {
 
-    func testFrontmatterValueFromString() throws {
+    func testFrontMatterValueFromString() throws {
         let testval = "test"
-        let val = FrontmatterValue.fromAny(testval)
-        XCTAssertEqual(val, FrontmatterValue.stringValue(testval))
+        let val = FrontMatterValue.fromAny(testval)
+        XCTAssertEqual(val, FrontMatterValue.stringValue(testval))
     }
 
-    func testFrontmatterValueFromDate() throws {
+    func testFrontMatterValueFromDate() throws {
         let testval = Date()
-        let val = FrontmatterValue.fromAny(testval)
-        XCTAssertEqual(val, FrontmatterValue.dateValue(testval))
+        let val = FrontMatterValue.fromAny(testval)
+        XCTAssertEqual(val, FrontMatterValue.dateValue(testval))
     }
 
-    func testFrontmatterValueFromStringArray() throws {
+    func testFrontMatterValueFromStringArray() throws {
         let testval = ["hello", "world"]
-        let val = FrontmatterValue.fromAny(testval)
-        XCTAssertEqual(val, FrontmatterValue.arrayValue(testval))
+        let val = FrontMatterValue.fromAny(testval)
+        XCTAssertEqual(val, FrontMatterValue.arrayValue(testval))
     }
 
-    func testFrontmatterValueFromBoole() throws {
+    func testFrontMatterValueFromBoole() throws {
         let testval = false
-        let val = FrontmatterValue.fromAny(testval)
-        XCTAssertEqual(val, FrontmatterValue.booleValue(testval))
+        let val = FrontMatterValue.fromAny(testval)
+        XCTAssertEqual(val, FrontMatterValue.booleValue(testval))
     }
 
-    func testFrontmatterValueFromInt() throws {
+    func testFrontMatterValueFromInt() throws {
         let testval = 42
-        let val = FrontmatterValue.fromAny(testval)
-        XCTAssertEqual(val, FrontmatterValue.intValue(testval))
+        let val = FrontMatterValue.fromAny(testval)
+        XCTAssertEqual(val, FrontMatterValue.intValue(testval))
     }
 
-    func testFrontmatterValueFromUnsupported() throws {
+    func testFrontMatterValueFromUnsupported() throws {
         let testval = [1, 2, 3]
-        let val = FrontmatterValue.fromAny(testval)
-        XCTAssertEqual(val, FrontmatterValue.stringValue("\(testval)"))
+        let val = FrontMatterValue.fromAny(testval)
+        XCTAssertEqual(val, FrontMatterValue.stringValue("\(testval)"))
     }
 
     func testFrontmatterSerialisation() throws {
         let testval = Date()
-        let val = FrontmatterValue.fromAny(testval)
-        XCTAssertEqual(val, FrontmatterValue.dateValue(testval))
+        let val = FrontMatterValue.fromAny(testval)
+        XCTAssertEqual(val, FrontMatterValue.dateValue(testval))
 
         let jsonData = try JSONEncoder().encode(val)
-        let new_val = try JSONDecoder().decode(FrontmatterValue.self, from: jsonData)
+        let new_val = try JSONDecoder().decode(FrontMatterValue.self, from: jsonData)
         XCTAssertEqual(val, new_val)
     }
 }

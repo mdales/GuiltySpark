@@ -1,13 +1,13 @@
 import Foundation
 
-public enum FrontmatterValue: Codable, Equatable {
+public enum FrontMatterValue: Codable, Equatable {
 	case stringValue(String)
 	case arrayValue([String])
 	case dateValue(Date)
 	case intValue(Int)
 	case booleValue(Bool)
 
-	public static func fromAny(_ before: Any) -> FrontmatterValue {
+	public static func fromAny(_ before: Any) -> FrontMatterValue {
 		if let value = before as? String {
 			return .stringValue(value)
 		} else if let value = before as? Date {
@@ -20,6 +20,6 @@ public enum FrontmatterValue: Codable, Equatable {
 			return .intValue(value)
 		}
 		// clearly ick, but given YML is untyped the best I think we can do
-		return FrontmatterValue.stringValue("\(before)")
+		return FrontMatterValue.stringValue("\(before)")
 	}
 }

@@ -26,6 +26,7 @@ let package = Package(
         .target(
             name: "FrontMatter",
             dependencies: [
+                .product(name: "Yams", package: "Yams"),
             ]
         ),
         .testTarget(
@@ -44,7 +45,6 @@ let package = Package(
             name: "indexer",
             dependencies: [
                 .product(name: "ArgumentParser", package: "swift-argument-parser"),
-                .product(name: "Yams", package: "Yams"),
                 "FrontMatter",
                 "shared"
             ]

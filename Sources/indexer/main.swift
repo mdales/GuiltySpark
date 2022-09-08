@@ -2,47 +2,32 @@ import Foundation
 
 import ArgumentParser
 import PorterStemmer2
-import Yams
 
 import FrontMatter
 import shared
 
 let fm = FileManager.default
 
-enum ParseError: Error {
-	case StemmerLoadFailure
-}
-
 func parseMarkdownDocument(_ path: URL, baseurl: URL) throws -> Document? {
 
-	let data = try Data(contentsOf: path)
-	let parser = try Yams.Parser(yaml: data, resolver: .default, constructor: .default, encoding: .default)
-	guard let frontmatterNode = try parser.nextRoot() else {
-		return nil
-	}
+	let document = try FrontMatterDocument(path)
 
 	// The Yams parser doesn't give us a clean way to get the rest of the document, so we mostly let
 	// it error trying to parse the data after the frontmatter and assume that the offset it gives us
 	// is where the markdown starts
-	var markdown_mark: Mark? = nil
-	do {
-		let next = try parser.nextRoot()
-		markdown_mark = next?.mark
-	} catch YamlError.parser(_, let problem, let mark, _) {
-		markdown_mark = mark
-	} catch YamlError.scanner(_, let problem, let mark, let yaml) {
-		markdown_mark = mark
-	}
+	// var markdown_mark: Mark? = nil
+	// do {
+	// 	let next = try parser.nextRoot()
+	// 	markdown_mark = next?.mark
+	// } catch YamlError.parser(_, let problem, let mark, _) {
+	// 	markdown_mark = mark
+	// } catch YamlError.scanner(_, let problem, let mark, let yaml) {
+	// 	markdown_mark = mark
+	// }
 	// If there's other errors we don't handle let them bubble up, hence no catchall catch
 
 
-	let frontmatter = frontmatterNode.any as? Dictionary<String,Any>
-	guard let frontmatter = frontmatter else {
-		return nil
-	}
-	let converted = frontmatter.mapValues(FrontmatterValue.fromAny)
-
-	if let draft_status = converted[KeyDraft] {
+	if let draft_status = document.frontMatter[KeyDraft] {
 		switch draft_status {
 		case .booleValue(let is_draft):
 			if is_draft {
@@ -53,25 +38,25 @@ func parseMarkdownDocument(_ path: URL, baseurl: URL) throws -> Document? {
 		}
 	}
 
-	var things = Entry.entriesFromFrontmatter(converted)
+	let things = Entry.entriesFromFrontmatter(document.frontMatter)
 
-	if let markdown_mark = markdown_mark {
-		if let document = String(data: data, encoding: .utf8) {
-			// We now need to use the line number/offset to work out where the parser stopped working
-			let lines = document.split(separator: "\n")
-			let fail_line = markdown_mark.line - 1 // This is human readable line number
-			if lines.count > fail_line {
-				print(lines[fail_line])
-			} else {
-				print("document \(path) has \(lines.count) lines, and yaml fail is at \(markdown_mark)")
-			}
-
-			things += Entry.entriesFromMarkdown(document)
-		}
-	}
+// 	if let markdown_mark = markdown_mark {
+// 		if let document = String(data: data, encoding: .utf8) {
+// 			// We now need to use the line number/offset to work out where the parser stopped working
+// 			let lines = document.split(separator: "\n")
+// 			let fail_line = markdown_mark.line - 1 // This is human readable line number
+// 			if lines.count > fail_line {
+// 				print(lines[fail_line])
+// 			} else {
+// 				print("document \(path) has \(lines.count) lines, and yaml fail is at \(markdown_mark)")
+// 			}
+//
+// 			things += Entry.entriesFromMarkdown(document)
+// 		}
+// 	}
 
 	var date: Date? = nil
-	if let frontmatter_date = converted[KeyDate] {
+	if let frontmatter_date = document.frontMatter[KeyDate] {
 		switch frontmatter_date {
 		case .dateValue(let val):
 			date = val

@@ -2,6 +2,8 @@
 
 A very basic search engine for my static website. Consists of a indexer that will run over the markdown+frontmatter pre-rendered documents, and then a small server that will respond to queries with a list of matching documents based on a combination of the corpus saved by the indexer and a bibliography saved by the static site generator.
 
+This has been tested with my set of [Hugo](https://gohugo.io) websites, but should work with any frontmatter based static site with a little work (e.g., [Jekyll](https://jekyllrb.com), [In-Context](https://github.com/inseven/incontext), etc.), as it relies on the site generator outputing a support file to save Guilty Spark guessing how names get changed during generation.
+
 # Admin side usage
 
 There's three stages here, two of which you'll most likely do offline, and the last stage that will need to run on a live server somewhere:

@@ -6,7 +6,7 @@ final class FrontMatterDocumentTests: XCTestCase {
 
 	func testEmptyDocument() throws {
 		XCTAssertThrowsError(try FrontMatterDocument(data: Data())) { error in
-			XCTAssertEqual(error as? FrontMatterDocumentError, .FailedToParseDocument)
+			XCTAssertEqual(error as? FrontMatterDocumentError, .FailedToFindFirstDelimiter)
 		}
 	}
 
@@ -15,9 +15,9 @@ final class FrontMatterDocumentTests: XCTestCase {
 ---
 ---
 """
-		// Not sure this is ideal, but for now it's not the end of the world
+		// Not 100% sure this should be an error, rather than no data?
 		XCTAssertThrowsError(try FrontMatterDocument(data: Data(testdoc.utf8))) { error in
-			XCTAssertEqual(error as? FrontMatterDocumentError, .FailedToParseYAML)
+			XCTAssertEqual(error as? FrontMatterDocumentError, .FailedToFindFrontmatterRoot)
 		}
 	}
 
@@ -38,14 +38,37 @@ final class FrontMatterDocumentTests: XCTestCase {
 		// because Hugo accepts JSON frontmatter.
 		let testdoc = """
 ---
-{"title": "hello, world"}
+{"title": "Hello, world"}
 ---
 """
 		let document = try FrontMatterDocument(data: Data(testdoc.utf8))
 		XCTAssertEqual(document.frontMatter.count, 1)
+		XCTAssertEqual(document.frontMatter["title"], FrontMatterValue.stringValue("Hello, world"))
 	}
 
-	func testSimpleFront() throws {
+	func testMissingFirstDelimiter() throws {
+		let testdoc = """
+title: "Hello, world"
+---
+"""
+		// There is one delimiter in there, and our parser ignores data before the first
+		// delimiter, so hence this is a missing second delimiter
+		XCTAssertThrowsError(try FrontMatterDocument(data: Data(testdoc.utf8))) { error in
+			XCTAssertEqual(error as? FrontMatterDocumentError, .FailedToFindSecondDelimiter)
+		}
+	}
+
+	func testMissingSecondDelimiter() throws {
+		let testdoc = """
+---
+title: "Hello, world"
+"""
+		XCTAssertThrowsError(try FrontMatterDocument(data: Data(testdoc.utf8))) { error in
+			XCTAssertEqual(error as? FrontMatterDocumentError, .FailedToFindSecondDelimiter)
+		}
+	}
+
+	func testEmptyMarkdownDocument() throws {
 		let testdoc = """
 ---
 title: "Hello, world"
@@ -53,5 +76,35 @@ title: "Hello, world"
 """
 		let document = try FrontMatterDocument(data: Data(testdoc.utf8))
 		XCTAssertEqual(document.frontMatter.count, 1)
+		XCTAssertEqual(document.frontMatter["title"], FrontMatterValue.stringValue("Hello, world"))
+		XCTAssertEqual(document.markdown, "")
+	}
+
+	func testSimpleDocument() throws {
+		let testdoc = """
+---
+title: "Hello, world"
+---
+This is a doc
+"""
+		let document = try FrontMatterDocument(data: Data(testdoc.utf8))
+		XCTAssertEqual(document.frontMatter.count, 1)
+		XCTAssertEqual(document.frontMatter["title"], FrontMatterValue.stringValue("Hello, world"))
+		XCTAssertEqual(document.markdown, "This is a doc")
+	}
+
+	func testDocumentWithMarkdownHorizontalRule() throws {
+		// Basically we want to know this wasn't treated as a frontmatter delimiter
+		let testdoc = """
+---
+title: "Hello, world"
+---
+This is a doc
+---
+"""
+		let document = try FrontMatterDocument(data: Data(testdoc.utf8))
+		XCTAssertEqual(document.frontMatter.count, 1)
+		XCTAssertEqual(document.frontMatter["title"], FrontMatterValue.stringValue("Hello, world"))
+		XCTAssertEqual(document.markdown, "This is a doc\n---")
 	}
 }

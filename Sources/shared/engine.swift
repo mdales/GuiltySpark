@@ -14,7 +14,7 @@ public struct NaiveSearchEngine {
 				switch (entry.entry) {
 				case let .tag(value):
 					word = value
-				case let .content(value, _):
+				case let .content(value):
 					word = value
 				case let .title(value):
 					word = value
@@ -51,7 +51,7 @@ public struct NaiveSearchEngine {
 				return 100 * terms.filter{$0 == value}.count
 			case .title(let value):
 				return 10 * terms.filter{$0 == value}.count
-			case .content(let value, _):
+			case .content(let value):
 				return 1 * terms.filter{$0 == value}.count
 			}
 		}.reduce(0, +)

@@ -45,4 +45,16 @@ final class indexerTests: XCTestCase {
 		let entries = Entry.entriesFromFrontmatter(frontmatter)
 		XCTAssertEqual(entries.count, 2)
 	}
+
+	func testEmptyMarkdown() throws {
+		let entries = Entry.entriesFromMarkdown("")
+		XCTAssertEqual(entries.count, 0)
+	}
+
+	func testSimpleMarkdown() throws {
+		let entries = Entry.entriesFromMarkdown("""
+hello, world!
+""")
+		XCTAssertEqual(entries.count, 2)
+	}
 }

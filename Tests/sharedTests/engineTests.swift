@@ -100,7 +100,7 @@ final class engineTests: XCTestCase {
 			entries: [
 				Entry(.tag("tag")),
 				Entry(.title("title")),
-				Entry(.content("content", 42))
+				Entry(.content("content"))
 			],
 			date: Date()
 		)

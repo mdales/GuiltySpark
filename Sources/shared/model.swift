@@ -23,7 +23,7 @@ public struct Entry: Codable {
 	public enum EntryType: Codable {
 		case tag(String)
 		case title(String)
-		case content(String, Int)
+		case content(String)
 	}
 
 	let entry: EntryType
@@ -38,7 +38,7 @@ public struct Entry: Codable {
 			switch tags {
 			case .stringValue(let tag):
 				things += NaiveSearchEngine.tokeniseString(tag).map {
-					Entry(.tag(normaliseString($0)))
+					Entry(.tag($0))
 				}
 			case .arrayValue(let tags):
 				things += Set(tags.flatMap { NaiveSearchEngine.tokeniseString($0) }).map {
@@ -63,7 +63,7 @@ public struct Entry: Codable {
 	}
 
 	static public func entriesFromMarkdown(_ markdown: String) -> [Entry] {
-		return []
+		return NaiveSearchEngine.tokeniseString(markdown).map {Entry(.content($0))}
 	}
 }
 

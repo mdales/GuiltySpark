@@ -26,7 +26,7 @@ public struct Entry: Codable {
 		case content(String)
 	}
 
-	let entry: EntryType
+	public let entry: EntryType
 
 	public init(_ entry: EntryType) {
 		self.entry = entry
@@ -69,8 +69,8 @@ public struct Entry: Codable {
 
 public struct Document: Codable, Hashable {
 	public let path: String
-	let entries: [Entry]
-	let date: Date
+	public let entries: [Entry]
+	public let date: Date
 
 	public init(
 		path: String,

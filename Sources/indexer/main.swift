@@ -24,7 +24,7 @@ func parseMarkdownDocument(_ path: URL, baseurl: URL) throws -> Document? {
 	}
 
 	let things = Entry.entriesFromFrontmatter(document.frontMatter) +
-		Entry.entriesFromMarkdown(document.markdown)
+		Entry.entriesFromMarkdown(document.plainText)
 
 	var date: Date? = nil
 	if let frontmatter_date = document.frontMatter[KeyDate] {
@@ -62,6 +62,39 @@ func recursiveProcess(_ path: URL, baseurl: URL) throws -> [Document] {
 	}
 }
 
+func calculateStats(_ documents: [Document]) {
+	var wordFrequency: [String:Int] = [:]
+
+	var doccount = 0
+	for document in documents {
+		var count = 0
+		for entry in document.entries {
+			switch entry.entry {
+			case .content(let val):
+				count = count + 1
+				if let frequency = wordFrequency[val] {
+					wordFrequency[val] = frequency + 1
+				} else {
+					wordFrequency[val] = 1
+				}
+			default:
+				break
+			}
+		}
+		if count > 0 {
+			doccount += 1
+		}
+	}
+
+	print("There are \(wordFrequency.count) unique stems in \(doccount) documents")
+
+	let sorted = wordFrequency.sorted { $0.1 > $1.1 }
+	for (index, entry) in sorted[0..<20].enumerated() {
+		print("\(index + 1): \(entry.key) \(String(format: "%.2f", (Double(entry.value) / Double(documents.count)) * 100.0))%")
+	}
+
+}
+
 struct Indexer: ParsableCommand {
 	@Argument() var contentPath: String
 	@Argument() var outputFile: String
@@ -73,6 +106,8 @@ struct Indexer: ParsableCommand {
 		do {
 			let corpus = try recursiveProcess(corpus_url, baseurl: corpus_url)
 			print("we processed \(corpus.count) documents")
+
+			calculateStats(corpus)
 
 			let jsonEncoder = JSONEncoder()
 			if #available(macOS 10.12, *) {

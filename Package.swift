@@ -10,6 +10,7 @@ let package = Package(
         .package(url: "https://github.com/jpsim/Yams.git", from: "5.0.1"),
         .package(url: "https://github.com/NozeIO/MicroExpress.git", from: "0.5.4"),
         .package(url: "https://github.com/scaraux/Swift-Porter-Stemmer-2.git", from: "0.1.1"),
+        .package(url: "https://github.com/apple/swift-markdown.git", .branch("main")),
     ],
     targets: [
         .target(
@@ -27,6 +28,7 @@ let package = Package(
             name: "FrontMatter",
             dependencies: [
                 .product(name: "Yams", package: "Yams"),
+                .product(name: "Markdown", package: "swift-markdown"),
             ]
         ),
         .testTarget(

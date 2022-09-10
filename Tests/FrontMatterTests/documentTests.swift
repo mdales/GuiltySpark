@@ -77,7 +77,7 @@ title: "Hello, world"
 		let document = try FrontMatterDocument(data: Data(testdoc.utf8))
 		XCTAssertEqual(document.frontMatter.count, 1)
 		XCTAssertEqual(document.frontMatter["title"], FrontMatterValue.stringValue("Hello, world"))
-		XCTAssertEqual(document.markdown, "")
+		XCTAssertEqual(document.rawMarkdown, "")
 	}
 
 	func testSimpleDocument() throws {
@@ -90,7 +90,8 @@ This is a doc
 		let document = try FrontMatterDocument(data: Data(testdoc.utf8))
 		XCTAssertEqual(document.frontMatter.count, 1)
 		XCTAssertEqual(document.frontMatter["title"], FrontMatterValue.stringValue("Hello, world"))
-		XCTAssertEqual(document.markdown, "This is a doc")
+		XCTAssertEqual(document.rawMarkdown, "This is a doc")
+		XCTAssertEqual(document.plainText, "This is a doc")
 	}
 
 	func testDocumentWithMarkdownHorizontalRule() throws {
@@ -105,6 +106,22 @@ This is a doc
 		let document = try FrontMatterDocument(data: Data(testdoc.utf8))
 		XCTAssertEqual(document.frontMatter.count, 1)
 		XCTAssertEqual(document.frontMatter["title"], FrontMatterValue.stringValue("Hello, world"))
-		XCTAssertEqual(document.markdown, "This is a doc\n---")
+		XCTAssertEqual(document.rawMarkdown, "This is a doc\n---")
+		XCTAssertEqual(document.plainText, "This is a doc")
+	}
+
+	func testDocumentWithMarkdownLink() throws {
+		// Basically we want to know this wasn't treated as a frontmatter delimiter
+		let testdoc = """
+---
+title: "Hello, world"
+---
+This is a [doc](https://example.com)
+"""
+		let document = try FrontMatterDocument(data: Data(testdoc.utf8))
+		XCTAssertEqual(document.frontMatter.count, 1)
+		XCTAssertEqual(document.frontMatter["title"], FrontMatterValue.stringValue("Hello, world"))
+		XCTAssertEqual(document.rawMarkdown, "This is a [doc](https://example.com)")
+		XCTAssertEqual(document.plainText, "This is a doc")
 	}
 }

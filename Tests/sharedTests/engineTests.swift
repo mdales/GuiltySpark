@@ -8,12 +8,12 @@ final class engineTests: XCTestCase {
 		let documents = [
 			Document(
 				path: "/a",
-				entries: [Entry(.tag("foo"))],
+				entries: [Entry.tag("foo")],
 				date: Date()
 			),
 			Document(
 				path: "/b",
-				entries: [Entry(.tag("bar"))],
+				entries: [Entry.tag("bar")],
 				date: Date()
 			)
 		]
@@ -39,12 +39,12 @@ final class engineTests: XCTestCase {
 		let documents = [
 			Document(
 				path: "/a",
-				entries: [Entry(.tag("älgen"))],
+				entries: [Entry.tag("älgen")],
 				date: Date()
 			),
 			Document(
 				path: "/b",
-				entries: [Entry(.tag("🎸"))],
+				entries: [Entry.tag("🎸")],
 				date: Date()
 			)
 		]
@@ -64,7 +64,7 @@ final class engineTests: XCTestCase {
 		let documents = [
 			Document(
 				path: "/a",
-				entries: [Entry(.tag("foo")), Entry(.title("foo")), Entry(.content("foo"))],
+				entries: [Entry.tag("foo"), Entry.title("foo"), Entry.content("foo")],
 				date: Date()
 			),
 		]
@@ -82,7 +82,7 @@ final class engineTests: XCTestCase {
 		let documents = [
 			Document(
 				path: "/a",
-				entries: [Entry(.tag("foo")), Entry(.tag("bar"))],
+				entries: [Entry.tag("foo"), Entry.tag("bar")],
 				date: Date()
 			),
 		]
@@ -98,9 +98,9 @@ final class engineTests: XCTestCase {
 		let document = Document(
 			path: "/a",
 			entries: [
-				Entry(.tag("tag")),
-				Entry(.title("title")),
-				Entry(.content("content"))
+				Entry.tag("tag"),
+				Entry.title("title"),
+				Entry.content("content")
 			],
 			date: Date()
 		)
@@ -127,17 +127,17 @@ final class engineTests: XCTestCase {
 		let documents = [
 			Document(
 				path: "/a",
-				entries: [Entry(.tag(normaliseString("foo")))],
+				entries: [Entry.tag(normaliseString("foo"))],
 				date: Date()
 			),
 			Document(
 				path: "/b",
-				entries: [Entry(.tag(normaliseString("bar")))],
+				entries: [Entry.tag(normaliseString("bar"))],
 				date: Date()
 			),
 			Document(
 				path: "/c",
-				entries: [Entry(.tag(normaliseString("älgen")))],
+				entries: [Entry.tag(normaliseString("älgen"))],
 				date: Date()
 			)
 		]
@@ -163,12 +163,12 @@ final class engineTests: XCTestCase {
 		let documents = [
 			Document(
 				path: "/a",
-				entries: [Entry(.tag("foo"))],
+				entries: [Entry.tag("foo")],
 				date: Date() - 100
 			),
 			Document(
 				path: "/b",
-				entries: [Entry(.tag("foo"))],
+				entries: [Entry.tag("foo")],
 				date: Date()
 			)
 		]
@@ -185,17 +185,17 @@ final class engineTests: XCTestCase {
 		let documents = [
 			Document(
 				path: "/a",
-				entries: [Entry(.title("foo"))],
+				entries: [Entry.title("foo")],
 				date: Date()
 			),
 			Document(
 				path: "/b",
-				entries: [Entry(.tag("foo"))],
+				entries: [Entry.tag("foo")],
 				date: Date()
 			),
 			Document(
 				path: "/c",
-				entries: [Entry(.content("foo"))],
+				entries: [Entry.content("foo")],
 				date: Date()
 			)
 		]

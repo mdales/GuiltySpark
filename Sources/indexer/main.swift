@@ -79,7 +79,7 @@ struct Indexer: ParsableCommand {
 				return Document(
 					path: $0.path,
 					entries: $0.entries.filter {
-						switch $0.entry {
+						switch $0 {
 						case .content(let val):
 							return !commonStems.contains(val)
 						default:

@@ -19,18 +19,10 @@ let KeyTitle = "title"
 public let KeyDate = "date"
 public let KeyDraft = "draft"
 
-public struct Entry: Codable {
-	public enum EntryType: Codable {
-		case tag(String)
-		case title(String)
-		case content(String)
-	}
-
-	public let entry: EntryType
-
-	public init(_ entry: EntryType) {
-		self.entry = entry
-	}
+public enum Entry: Codable {
+	case tag(String)
+	case title(String)
+	case content(String)
 
 	static public func entriesFromFrontmatter(_ frontmatter: [String:FrontMatterValue]) -> [Entry] {
 		var things: [Entry] = []
@@ -38,11 +30,11 @@ public struct Entry: Codable {
 			switch tags {
 			case .stringValue(let tag):
 				things += NaiveSearchEngine.tokeniseString(tag).map {
-					Entry(.tag($0))
+					Entry.tag($0)
 				}
 			case .arrayValue(let tags):
 				things += Set(tags.flatMap { NaiveSearchEngine.tokeniseString($0) }).map {
-					Entry(.tag($0))
+					Entry.tag($0)
 				}
 			default:
 				break
@@ -53,7 +45,7 @@ public struct Entry: Codable {
 			switch title {
 			case .stringValue(let title):
 				let parts = NaiveSearchEngine.tokeniseString(title)
-					.map { Entry(.title($0)) }
+					.map { Entry.title($0) }
 				things += parts
 			default:
 				break
@@ -63,7 +55,7 @@ public struct Entry: Codable {
 	}
 
 	static public func entriesFromMarkdown(_ markdown: String) -> [Entry] {
-		return NaiveSearchEngine.tokeniseString(markdown).map {Entry(.content($0))}
+		return NaiveSearchEngine.tokeniseString(markdown).map {Entry.content($0)}
 	}
 }
 
@@ -95,7 +87,7 @@ public struct Document: Codable, Hashable {
 
 		for document in documents {
 			for entry in document.entries {
-				switch entry.entry {
+				switch entry {
 				case .content(let val):
 					if let frequency = wordFrequency[val] {
 						wordFrequency[val] = frequency + 1

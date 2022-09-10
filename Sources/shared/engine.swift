@@ -11,7 +11,7 @@ public struct NaiveSearchEngine {
 		for (index, document) in documents.enumerated() {
 			document.entries.forEach { entry in
 				var word: String? = nil
-				switch (entry.entry) {
+				switch entry {
 				case let .tag(value):
 					word = value
 				case let .content(value):
@@ -46,7 +46,7 @@ public struct NaiveSearchEngine {
 
 	static func rankMatch(terms: Set<String>, document: Document) -> Int {
 		return document.entries.map { entry -> Int in
-			switch entry.entry {
+			switch entry {
 			case .tag(let value):
 				return 100 * terms.filter{$0 == value}.count
 			case .title(let value):

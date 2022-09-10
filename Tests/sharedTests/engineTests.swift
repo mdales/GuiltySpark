@@ -64,7 +64,7 @@ final class engineTests: XCTestCase {
 		let documents = [
 			Document(
 				path: "/a",
-				entries: [Entry(.tag("foo")), Entry(.title("foo"))],
+				entries: [Entry(.tag("foo")), Entry(.title("foo")), Entry(.content("foo"))],
 				date: Date()
 			),
 		]
@@ -192,14 +192,19 @@ final class engineTests: XCTestCase {
 				path: "/b",
 				entries: [Entry(.tag("foo"))],
 				date: Date()
+			),
+			Document(
+				path: "/c",
+				entries: [Entry(.content("foo"))],
+				date: Date()
 			)
 		]
 		let engine = NaiveSearchEngine(documents)
 
 		// Expect newest items first
 		let result = engine.findAndRank("foo")
-		XCTAssertEqual(result.count, 2)
+		XCTAssertEqual(result.count, 3)
 		XCTAssertEqual(result.first!.path, "/b")
-		XCTAssertEqual(result.last!.path, "/a")
+		XCTAssertEqual(result.last!.path, "/c")
 	}
 }

@@ -89,4 +89,25 @@ public struct Document: Codable, Hashable {
 	public func hash(into hasher: inout Hasher) {
 		hasher.combine(path)
 	}
+
+	static public func calculateCommonStems(_ documents: [Document]) -> [String] {
+		var wordFrequency: [String:Int] = [:]
+
+		for document in documents {
+			for entry in document.entries {
+				switch entry.entry {
+				case .content(let val):
+					if let frequency = wordFrequency[val] {
+						wordFrequency[val] = frequency + 1
+					} else {
+						wordFrequency[val] = 1
+					}
+				default:
+					break
+				}
+			}
+		}
+
+    	return wordFrequency.sorted { $0.1 > $1.1 }[0..<50].filter { $0.key.count < 5 }.map {$0.key}
+	}
 }

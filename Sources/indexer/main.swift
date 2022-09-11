@@ -75,6 +75,7 @@ struct Indexer: ParsableCommand {
 			print("we processed \(corpus.count) documents")
 
 			let commonStems = Document.calculateCommonStems(corpus)
+			print("Removing \(commonStems.count) common stems")
 			let filteredCorpus = corpus.map {
 				return Document(
 					path: $0.path,

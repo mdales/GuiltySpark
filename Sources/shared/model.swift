@@ -85,7 +85,9 @@ public struct Document: Codable, Hashable {
 	static public func calculateCommonStems(_ documents: [Document]) -> [String] {
 		var wordFrequency: [String:Int] = [:]
 
+		var contributingDocs = 0
 		for document in documents {
+			var contributed = false
 			for entry in document.entries {
 				switch entry {
 				case .content(let val):
@@ -94,12 +96,33 @@ public struct Document: Codable, Hashable {
 					} else {
 						wordFrequency[val] = 1
 					}
+					contributed = true
 				default:
 					break
+				}
+				if contributed {
+					contributingDocs += 1
 				}
 			}
 		}
 
-    	return wordFrequency.sorted { $0.1 > $1.1 }[0..<50].filter { $0.key.count < 5 }.map {$0.key}
+		// How to define common is difficult. The aim here is to remove words of high
+		// frequency but not remove words that are of import. E.g., my blog about guitars
+		// has a very high occurrence of the word guitar, but people expect to find
+		// results if they search for that term.
+		//
+		// It might be also tempting to say go by what is in say above 90% of pages or
+		// some other watermark, but then I have another site where 20% or so of pages
+		// don't contain "proper" sentences, and so push down the occurrence of the obvious
+		// words from high nineties to mid seventies percent wise.
+		//
+		// There is no perfect here, we just want something that works okay and stops
+		// the corpus becoming pointlessly bloated.
+		let documentFrequncyThreshold = Int(Double(contributingDocs) * 0.80)
+    	return wordFrequency
+			.filter{$0.value < documentFrequncyThreshold}
+			.filter{$0.key.count < 5}
+			.sorted{$0.1 > $1.1}
+			.map{$0.key}
 	}
 }
